@@ -1,4 +1,29 @@
-import { COMPONENTS, COMP_SVG, DOOR_OPTIONS, WINDOW_OPTIONS, BENCH_OPTIONS, SPEAKER_OPTIONS, CONTROLUNIT_OPTIONS, THERMOMETER_OPTIONS, TIMER_OPTIONS } from '../constants.jsx'
+import { COMPONENTS, COMP_SVG } from '../constants.jsx'
+import { useState, useEffect } from 'react'
+
+function DimInput({ value, onChange, onCommit }) {
+  const [local, setLocal] = useState(String(value))
+
+  useEffect(() => { setLocal(String(value)) }, [value])
+
+  return (
+    <input
+      className="prop-input"
+      type="text"
+      inputMode="numeric"
+      value={local}
+      onChange={e => setLocal(e.target.value)}
+      onBlur={() => {
+        const n = parseFloat(local)
+        if (!isNaN(n) && n > 0) { onChange(n); onCommit(n) }
+        else setLocal(String(value))   // restore last valid value
+      }}
+      onKeyDown={e => {
+        if (e.key === 'Enter') e.target.blur()
+      }}
+    />
+  )
+}
 
 const STEP_TYPES = {
   0: [],
@@ -13,17 +38,13 @@ const STEP_HINTS = {
   4: 'Your design is ready. Click BIM (IFC) to export.',
 }
 
-export default function Sidebar({ saunaType, onTypeSwitch, onCompDragStart, step, dims, onUpdateDims, selectedComp, onUpdateComp }) {
+export default function Sidebar({ saunaType, onTypeSwitch, onCompDragStart, step, onStepChange, dims, onUpdateDims, selectedComp, onUpdateComp }) {
   const visibleTypes = STEP_TYPES[step] ?? []
   const visibleComps = COMPONENTS.filter(c => visibleTypes.includes(c.type))
 
-  const updateDim = (key, val, commit = false) => {
-    const n = parseFloat(val)
-    if (!isNaN(n) && n > 0) onUpdateDims({ ...dims, [key]: n }, commit)
-  }
 
   return (
-    <aside className="sidebar" onClick={e => e.stopPropagation()}>
+    <aside className="sidebar" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}>
 
       {/* Sauna type switcher */}
       <div className="sb-section">
@@ -86,18 +107,6 @@ export default function Sidebar({ saunaType, onTypeSwitch, onCompDragStart, step
               Properties — <span style={{ color: 'var(--orange)', textTransform: 'uppercase' }}>{selectedComp.type}</span>
             </div>
             <div className="prop-row">
-              <span className="prop-label">Pos X</span>
-              <input className="prop-input" type="number" value={Math.round(selectedComp.x)}
-                onChange={e => onUpdateComp(selectedComp.id, { x: +e.target.value }, false)}
-                onBlur={() => onUpdateComp(selectedComp.id, { x: selectedComp.x }, true)} />
-            </div>
-            <div className="prop-row">
-              <span className="prop-label">Pos Y</span>
-              <input className="prop-input" type="number" value={Math.round(selectedComp.y)}
-                onChange={e => onUpdateComp(selectedComp.id, { y: +e.target.value }, false)}
-                onBlur={() => onUpdateComp(selectedComp.id, { y: selectedComp.y }, true)} />
-            </div>
-            <div className="prop-row">
               <span className="prop-label">Height (Z)</span>
               <input className="prop-input" type="number" value={Math.round(selectedComp.z)}
                 onChange={e => onUpdateComp(selectedComp.id, { z: +e.target.value }, false)}
@@ -115,90 +124,70 @@ export default function Sidebar({ saunaType, onTypeSwitch, onCompDragStart, step
                 onChange={e => onUpdateComp(selectedComp.id, { h: +e.target.value }, false)}
                 onBlur={() => onUpdateComp(selectedComp.id, { h: selectedComp.h }, true)} />
             </div>
-            {selectedComp.type === 'door' && (
-              <div className="prop-row">
-                <span className="prop-label">Style</span>
-                <select className="prop-input" value={selectedComp.style || 'Full Glass'}
-                  onChange={e => onUpdateComp(selectedComp.id, { style: e.target.value }, true)}>
-                  {DOOR_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
-            {selectedComp.type === 'window' && (
-              <div className="prop-row">
-                <span className="prop-label">Style</span>
-                <select className="prop-input" value={selectedComp.style || 'Clear Pane'}
-                  onChange={e => onUpdateComp(selectedComp.id, { style: e.target.value }, true)}>
-                  {WINDOW_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
-            {selectedComp.type === 'bench' && (
-              <div className="prop-row">
-                <span className="prop-label">Style</span>
-                <select className="prop-input" value={selectedComp.style || 'L-Shape'}
-                  onChange={e => onUpdateComp(selectedComp.id, { style: e.target.value }, true)}>
-                  {BENCH_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
-            {selectedComp.type === 'speaker' && (
-              <div className="prop-row">
-                <span className="prop-label">Type</span>
-                <select className="prop-input" value={selectedComp.style || 'Wall Mount'}
-                  onChange={e => onUpdateComp(selectedComp.id, { style: e.target.value }, true)}>
-                  {SPEAKER_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
-            {selectedComp.type === 'controlunit' && (
-              <div className="prop-row">
-                <span className="prop-label">Type</span>
-                <select className="prop-input" value={selectedComp.style || 'Digital'}
-                  onChange={e => onUpdateComp(selectedComp.id, { style: e.target.value }, true)}>
-                  {CONTROLUNIT_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
-            {selectedComp.type === 'thermometer' && (
-              <div className="prop-row">
-                <span className="prop-label">Type</span>
-                <select className="prop-input" value={selectedComp.style || 'Digital'}
-                  onChange={e => onUpdateComp(selectedComp.id, { style: e.target.value }, true)}>
-                  {THERMOMETER_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
-            {selectedComp.type === 'timer' && (
-              <div className="prop-row">
-                <span className="prop-label">Type</span>
-                <select className="prop-input" value={selectedComp.style || 'Digital'}
-                  onChange={e => onUpdateComp(selectedComp.id, { style: e.target.value }, true)}>
-                  {TIMER_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
           </>
         ) : step === 0 ? (
           <>
             <div className="sb-label">Room Dimensions</div>
-            {[
-              { label: 'Length',         key: 'length' },
-              { label: 'Width',          key: 'width' },
-              { label: 'Height',         key: 'height' },
-              { label: 'Wall Thickness', key: 'wall' },
-            ].map(({ label, key }) => (
-              <div className="prop-row" key={key}>
-                <span className="prop-label">{label}</span>
-                <input className="prop-input" type="number" value={dims[key]}
-                  onChange={e => updateDim(key, e.target.value, false)}
-                  onBlur={() => updateDim(key, dims[key], true)}
-                  min="10" max="1000" />
-                <span className="prop-unit">cm</span>
-              </div>
-            ))}
+            {saunaType === 'barrel' ? (
+              [
+                { label: 'Diameter',       key: 'diameter' },
+                { label: 'Height',         key: 'height' },
+                { label: 'Wall Thickness', key: 'wall' },
+              ].map(({ label, key }) => (
+                <div className="prop-row" key={key}>
+                  <span className="prop-label">{label}</span>
+                  <DimInput
+                    value={key === 'diameter' ? dims.length : dims[key]}
+                    onChange={n => {
+                      if (key === 'diameter') onUpdateDims({ ...dims, length: n, width: n }, false)
+                      else onUpdateDims({ ...dims, [key]: n }, false)
+                    }}
+                    onCommit={n => {
+                      if (key === 'diameter') onUpdateDims({ ...dims, length: n, width: n }, true)
+                      else onUpdateDims({ ...dims, [key]: n }, true)
+                    }}
+                  />
+                  <span className="prop-unit">cm</span>
+                </div>
+              ))
+            ) : (
+              [
+                { label: 'Length',         key: 'length' },
+                { label: 'Width',          key: 'width' },
+                { label: 'Height',         key: 'height' },
+                { label: 'Wall Thickness', key: 'wall' },
+              ].map(({ label, key }) => (
+                <div className="prop-row" key={key}>
+                  <span className="prop-label">{label}</span>
+                  <DimInput
+                    value={dims[key]}
+                    onChange={n => onUpdateDims({ ...dims, [key]: n }, false)}
+                    onCommit={n => onUpdateDims({ ...dims, [key]: n }, true)}
+                  />
+                  <span className="prop-unit">cm</span>
+                </div>
+              ))
+            )}
           </>
         ) : null}
+      </div>
+
+      {/* ── Navigation ── */}
+      <div className="sb-nav-btns" style={{ display: 'flex', gap: '8px', padding: '16px', borderTop: '1px solid #e5e7eb', marginTop: 'auto' }}>
+        {step > 0 && (
+          <button className="nav-btn" style={{ flex: 1, justifyContent: 'center' }} onClick={() => onStepChange(step - 1)}>
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Back
+          </button>
+        )}
+        {step < 4 ? (
+          <button className="nav-btn nav-next" style={{ flex: 1, justifyContent: 'center' }} onClick={() => onStepChange(step + 1)}>
+            Next
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+        ) : (
+          <div style={{ flex: 1 }} />
+        )}
       </div>
 
     </aside>

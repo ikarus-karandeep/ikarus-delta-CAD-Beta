@@ -14,7 +14,7 @@ import './App.css'
 
 export default function App() {
   const [screen, setScreen]         = useState('selection')
-  const [saunaType, setSaunaType]   = useState('barrel')
+  const [saunaType, setSaunaType]   = useState('cube')
   const [step, setStep]             = useState(0)
   const [viewMode, setViewMode]     = useState('2d') // '2d' or '3d'
   const [ifcText, setIfcText]       = useState(null)
@@ -287,6 +287,7 @@ export default function App() {
         <Sidebar
           saunaType={saunaType}
           step={step}
+          onStepChange={setStep}
           onTypeSwitch={t => {
             const nextComps = getDefaultComps(t, dims)
             setSaunaType(t)

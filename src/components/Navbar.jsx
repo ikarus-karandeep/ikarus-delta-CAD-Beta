@@ -59,11 +59,15 @@ const STEPS = [
 export default function Navbar({ step, onStepChange, onExportSVG, onExportDXF, onExportIFC, onView3D, viewMode }) {
   return (
     <nav className="navbar" onClick={e => e.stopPropagation()}>
-<div className="nav-stepper">
+      <div className="nav-logo">
+        <img src="Logo.png"/>
+        {/* <span className="nav-logo-text">Ikarus <b>Delta</b></span> */}
+      </div>
+      <div className="nav-stepper">
         {STEPS.map((s, i) => {
           const done    = i < step
           const active  = i === step
-          const locked  = i > step
+          const locked  = i > step + 1
 
           return (
             <div key={i} className="ns-step-wrap">
@@ -95,18 +99,7 @@ export default function Navbar({ step, onStepChange, onExportSVG, onExportDXF, o
       <div className="nav-spacer" />
 
       <div className="nav-step-nav">
-        {step > 0 && (
-          <button className="nav-btn" onClick={() => onStepChange(step - 1)}>
-            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            Back
-          </button>
-        )}
-        {step < STEPS.length - 1 ? (
-          <button className="nav-btn nav-next" onClick={() => onStepChange(step + 1)}>
-            Next
-            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </button>
-        ) : (
+        {step === STEPS.length - 1 && (
           <>
             <button className="nav-export" onClick={onExportSVG} title="Download SVG">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>

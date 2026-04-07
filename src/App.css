@@ -78,9 +78,9 @@
   position: relative;
 }
 .nav-logo { display: flex; align-items: center; gap: 8px; margin-right: 6px; }
-.nav-logo svg { width: 28px; height: 28px; }
+.nav-logo img {  height: 64px; }
 .nav-logo-text { font-size: 16px; font-weight: 700; color: var(--text); }
-.nav-logo-text b { color: var(--orange); }
+/* .nav-logo-text b { color: var(--orange); } */
 .nav-divider { width: 1px; height: 28px; background: var(--border); margin: 0 2px; }
 .nav-project {
   font-size: 13px; font-weight: 600; color: var(--text);
@@ -226,7 +226,7 @@
 ══════════════════════════════════════ */
 .canvas-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 .canvas-toolbar {
-  position: absolute; bottom: 16px; right: 16px;
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
   background: var(--white); border: 1px solid var(--border);
   border-radius: var(--r); box-shadow: var(--shadow-md);
   display: flex; align-items: center; padding: 6px 10px; gap: 6px;
