@@ -4,9 +4,9 @@ const STEPS = [
     sub: 'Set dimensions',
     icon: (
       <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-        <rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.6"/>
-        <line x1="2" y1="7" x2="18" y2="7" stroke="currentColor" strokeWidth="1"/>
-        <line x1="7" y1="7" x2="7" y2="18" stroke="currentColor" strokeWidth="1"/>
+        <rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.6" />
+        <line x1="2" y1="7" x2="18" y2="7" stroke="currentColor" strokeWidth="1" />
+        <line x1="7" y1="7" x2="7" y2="18" stroke="currentColor" strokeWidth="1" />
       </svg>
     ),
   },
@@ -15,8 +15,8 @@ const STEPS = [
     sub: 'Doors & windows',
     icon: (
       <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-        <rect x="5" y="2" width="10" height="16" rx="1" stroke="currentColor" strokeWidth="1.6"/>
-        <circle cx="13" cy="10" r="1.2" fill="currentColor"/>
+        <rect x="5" y="2" width="10" height="16" rx="1" stroke="currentColor" strokeWidth="1.6" />
+        <circle cx="13" cy="10" r="1.2" fill="currentColor" />
       </svg>
     ),
   },
@@ -25,10 +25,10 @@ const STEPS = [
     sub: 'Heaters & benches',
     icon: (
       <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-        <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/>
-        <line x1="6" y1="8" x2="14" y2="8" stroke="currentColor" strokeWidth="1"/>
-        <line x1="6" y1="11" x2="14" y2="11" stroke="currentColor" strokeWidth="1"/>
-        <line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="1"/>
+        <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.6" />
+        <line x1="6" y1="8" x2="14" y2="8" stroke="currentColor" strokeWidth="1" />
+        <line x1="6" y1="11" x2="14" y2="11" stroke="currentColor" strokeWidth="1" />
+        <line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="1" />
       </svg>
     ),
   },
@@ -37,11 +37,11 @@ const STEPS = [
     sub: 'Lights & vents',
     icon: (
       <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-        <circle cx="10" cy="9" r="4" stroke="currentColor" strokeWidth="1.6"/>
-        <line x1="10" y1="2" x2="10" y2="4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-        <line x1="10" y1="14" x2="10" y2="16" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-        <line x1="3" y1="9" x2="5" y2="9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-        <line x1="15" y1="9" x2="17" y2="9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        <circle cx="10" cy="9" r="4" stroke="currentColor" strokeWidth="1.6" />
+        <line x1="10" y1="2" x2="10" y2="4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <line x1="10" y1="14" x2="10" y2="16" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <line x1="3" y1="9" x2="5" y2="9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <line x1="15" y1="9" x2="17" y2="9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -50,7 +50,7 @@ const STEPS = [
     sub: 'Export design',
     icon: (
       <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-        <path d="M4 10l4 4 8-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M4 10l4 4 8-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -82,7 +82,7 @@ export default function Navbar({ step, onStepChange, onExportSVG, onExportDXF, o
               >
                 <div className="ns-circle">
                   {done
-                    ? <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M3 8l3.5 3.5 6.5-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    ? <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M3 8l3.5 3.5 6.5-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     : s.icon
                   }
                 </div>
