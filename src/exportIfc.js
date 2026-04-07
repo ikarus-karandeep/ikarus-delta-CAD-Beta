@@ -112,20 +112,65 @@ export function generateSaunaIFC(saunaType, dims, placedComps) {
   const pxToMm = (px) => (px / S) * 10
   const L = mm(dims.length), W = mm(dims.width), H = mm(dims.height), wallT = mm(dims.wall)
 
-  // Floor
-  addEl('IFCSLAB', 'Floor', -L / 2, -W / 2, 0, 0, L, W, wallT, ',.FLOOR.')
+  if (saunaType === 'barrel') {
+    // Barrel sauna: cylindrical walls
+    const outerR = L / 2 + wallT
+    const innerR = L / 2
+    const segments = 48
 
-  // 4 Walls — track their IDs for opening voids
-  const frontWallId = addEl('IFCWALL', 'Front Wall', -L / 2, W / 2, 0, 0, L, wallT, H)
-  wallRegistry.push({ name: 'front', id: frontWallId, x: -L/2, y: W/2, axis: 'y', coord: W/2 })
-  const backWallId = addEl('IFCWALL', 'Back Wall', -L / 2, -W / 2 - wallT, 0, 0, L, wallT, H)
-  wallRegistry.push({ name: 'back', id: backWallId, x: -L/2, y: -W/2-wallT, axis: 'y', coord: -W/2 })
-  const leftWallId = addEl('IFCWALL', 'Left Wall', -L / 2 - wallT, -W / 2, 0, 0, wallT, W, H)
-  wallRegistry.push({ name: 'left', id: leftWallId, x: -L/2-wallT, y: -W/2, axis: 'x', coord: -L/2 })
-  const rightWallId = addEl('IFCWALL', 'Right Wall', L / 2, -W / 2, 0, 0, wallT, W, H)
-  wallRegistry.push({ name: 'right', id: rightWallId, x: L/2, y: -W/2, axis: 'x', coord: L/2 })
+    function circlePolyline(radius) {
+      const ptIds = []
+      for (let i = 0; i <= segments; i++) {
+        const a = (i / segments) * 2 * Math.PI
+        const pt = nextId(); emit(pt, 'IFCCARTESIANPOINT', pt2(radius * Math.cos(a), radius * Math.sin(a)))
+        ptIds.push(pt)
+      }
+      const poly = nextId(); emit(poly, 'IFCPOLYLINE', `(${ptIds.map(id => '#' + id).join(',')})`)
+      return poly
+    }
 
-  // Snap to nearest wall for doors/windows
+    // Floor — filled circle
+    const floorOuter = circlePolyline(outerR)
+    const floorProfile = nextId(); emit(floorProfile, 'IFCARBITRARYCLOSEDPROFILEDEF', `.AREA.,$,#${floorOuter}`)
+    const floorPos = nextId(); emit(floorPos, 'IFCAXIS2PLACEMENT3D', `#${origin3d},#${dirZ},#${dirX}`)
+    const floorSolid = nextId(); emit(floorSolid, 'IFCEXTRUDEDAREASOLID', `#${floorProfile},#${floorPos},#${dirZ},${wallT.toFixed(4)}`)
+    const floorRep = createRepresentation(floorSolid)
+    const floorPt = nextId(); emit(floorPt, 'IFCCARTESIANPOINT', pt3(0, 0, 0))
+    const floorAx = nextId(); emit(floorAx, 'IFCAXIS2PLACEMENT3D', `#${floorPt},#${dirZ},#${dirX}`)
+    const floorLp = nextId(); emit(floorLp, 'IFCLOCALPLACEMENT', `#${storeyPlacement},#${floorAx}`)
+    const floorEl = nextId(); emit(floorEl, 'IFCSLAB', `${ifcGuid()},$,'Floor',$,$,#${floorLp},#${floorRep},$,.FLOOR.`)
+    productIds.push(floorEl)
+
+    // Cylindrical wall — ring profile (outer circle with inner void)
+    const wallOuter = circlePolyline(outerR)
+    const wallInner = circlePolyline(innerR)
+    const wallProfile = nextId(); emit(wallProfile, 'IFCARBITRARYPROFILEDEFWITHVOIDS', `.AREA.,$,#${wallOuter},(#${wallInner})`)
+    const wallPos = nextId(); emit(wallPos, 'IFCAXIS2PLACEMENT3D', `#${origin3d},#${dirZ},#${dirX}`)
+    const wallSolid = nextId(); emit(wallSolid, 'IFCEXTRUDEDAREASOLID', `#${wallProfile},#${wallPos},#${dirZ},${H.toFixed(4)}`)
+    const wallRep = createRepresentation(wallSolid)
+    const wallPt = nextId(); emit(wallPt, 'IFCCARTESIANPOINT', pt3(0, 0, 0))
+    const wallAx = nextId(); emit(wallAx, 'IFCAXIS2PLACEMENT3D', `#${wallPt},#${dirZ},#${dirX}`)
+    const wallLp = nextId(); emit(wallLp, 'IFCLOCALPLACEMENT', `#${storeyPlacement},#${wallAx}`)
+    const wallEl = nextId(); emit(wallEl, 'IFCWALL', `${ifcGuid()},$,'Barrel Wall',$,$,#${wallLp},#${wallRep},$`)
+    productIds.push(wallEl)
+
+  } else {
+    // Cube sauna: rectangular walls
+    // Floor
+    addEl('IFCSLAB', 'Floor', -L / 2, -W / 2, 0, 0, L, W, wallT, ',.FLOOR.')
+
+    // 4 Walls — track their IDs for opening voids
+    const frontWallId = addEl('IFCWALL', 'Front Wall', -L / 2, W / 2, 0, 0, L, wallT, H)
+    wallRegistry.push({ name: 'front', id: frontWallId, x: -L/2, y: W/2, axis: 'y', coord: W/2 })
+    const backWallId = addEl('IFCWALL', 'Back Wall', -L / 2, -W / 2 - wallT, 0, 0, L, wallT, H)
+    wallRegistry.push({ name: 'back', id: backWallId, x: -L/2, y: -W/2-wallT, axis: 'y', coord: -W/2 })
+    const leftWallId = addEl('IFCWALL', 'Left Wall', -L / 2 - wallT, -W / 2, 0, 0, wallT, W, H)
+    wallRegistry.push({ name: 'left', id: leftWallId, x: -L/2-wallT, y: -W/2, axis: 'x', coord: -L/2 })
+    const rightWallId = addEl('IFCWALL', 'Right Wall', L / 2, -W / 2, 0, 0, wallT, W, H)
+    wallRegistry.push({ name: 'right', id: rightWallId, x: L/2, y: -W/2, axis: 'x', coord: L/2 })
+  }
+
+  // Snap to nearest wall for doors/windows (cube only)
   function snapToWall(px, py) {
     const halfL = L / 2, halfW = W / 2
     const dists = [
@@ -138,6 +183,13 @@ export function generateSaunaIFC(saunaType, dims, placedComps) {
     return dists[0]
   }
 
+  // Snap to barrel circle edge
+  function snapToBarrel(px, py) {
+    const r = L / 2
+    const angle = Math.atan2(py, px)
+    return { wx: r * Math.cos(angle), wy: r * Math.sin(angle), angle }
+  }
+
   placedComps.forEach(comp => {
     const cx = pxToMm(comp.x), cy = pxToMm(comp.y)
     const cw = pxToMm(comp.w || 44), ch = pxToMm(comp.h || 40)
@@ -146,31 +198,34 @@ export function generateSaunaIFC(saunaType, dims, placedComps) {
     switch (comp.type) {
       case 'door': {
         const doorH = H - wallT, doorW = cw
-        const nearest = snapToWall(cx, cy)
-        let dx, dy, dAngle
-        if (nearest.axis === 'y') { dx = cx - doorW / 2; dy = nearest.wy - wallT / 2; dAngle = rot }
-        else { dx = nearest.wy - wallT / 2; dy = cy - doorW / 2; dAngle = Math.PI / 2 + rot }
-        addEl('IFCDOOR', `Door - ${comp.style || 'Standard'}`, dx, dy, 0, dAngle, doorW, wallT + 100, doorH, `,${doorH.toFixed(4)},${doorW.toFixed(4)}`)
-
-        // Create opening in the nearest wall
-        const nearestWall = wallRegistry.find(w => w.name === nearest.wall)
-        if (nearestWall) {
-          addOpening(nearestWall.id, dx, dy, 0, dAngle, doorW, wallT + 200, doorH)
+        if (saunaType === 'barrel') {
+          const snap = snapToBarrel(cx, cy)
+          const dAngle = snap.angle
+          addEl('IFCDOOR', `Door - ${comp.style || 'Standard'}`, snap.wx - doorW / 2, snap.wy - wallT / 2, 0, dAngle, doorW, wallT + 100, doorH, `,${doorH.toFixed(4)},${doorW.toFixed(4)}`)
+        } else {
+          const nearest = snapToWall(cx, cy)
+          let dx, dy, dAngle
+          if (nearest.axis === 'y') { dx = cx - doorW / 2; dy = nearest.wy - wallT / 2; dAngle = rot }
+          else { dx = nearest.wy - wallT / 2; dy = cy - doorW / 2; dAngle = Math.PI / 2 + rot }
+          addEl('IFCDOOR', `Door - ${comp.style || 'Standard'}`, dx, dy, 0, dAngle, doorW, wallT + 100, doorH, `,${doorH.toFixed(4)},${doorW.toFixed(4)}`)
+          const nearestWall = wallRegistry.find(w => w.name === nearest.wall)
+          if (nearestWall) addOpening(nearestWall.id, dx, dy, 0, dAngle, doorW, wallT + 200, doorH)
         }
         break
       }
       case 'window': {
         const winH = 600, sill = 900, winW = cw
-        const nearest = snapToWall(cx, cy)
-        let wx, wy, wAngle
-        if (nearest.axis === 'y') { wx = cx - winW / 2; wy = nearest.wy - wallT / 2; wAngle = rot }
-        else { wx = nearest.wy - wallT / 2; wy = cy - winW / 2; wAngle = Math.PI / 2 + rot }
-        addEl('IFCWINDOW', `Window - ${comp.style || 'Standard'}`, wx, wy, sill, wAngle, winW, wallT + 100, winH, `,${winH.toFixed(4)},${winW.toFixed(4)}`)
-
-        // Create opening in the nearest wall
-        const nearestWall = wallRegistry.find(w => w.name === nearest.wall)
-        if (nearestWall) {
-          addOpening(nearestWall.id, wx, wy, sill, wAngle, winW, wallT + 200, winH)
+        if (saunaType === 'barrel') {
+          const snap = snapToBarrel(cx, cy)
+          addEl('IFCWINDOW', `Window - ${comp.style || 'Standard'}`, snap.wx - winW / 2, snap.wy - wallT / 2, sill, snap.angle, winW, wallT + 100, winH, `,${winH.toFixed(4)},${winW.toFixed(4)}`)
+        } else {
+          const nearest = snapToWall(cx, cy)
+          let wx, wy, wAngle
+          if (nearest.axis === 'y') { wx = cx - winW / 2; wy = nearest.wy - wallT / 2; wAngle = rot }
+          else { wx = nearest.wy - wallT / 2; wy = cy - winW / 2; wAngle = Math.PI / 2 + rot }
+          addEl('IFCWINDOW', `Window - ${comp.style || 'Standard'}`, wx, wy, sill, wAngle, winW, wallT + 100, winH, `,${winH.toFixed(4)},${winW.toFixed(4)}`)
+          const nearestWall = wallRegistry.find(w => w.name === nearest.wall)
+          if (nearestWall) addOpening(nearestWall.id, wx, wy, sill, wAngle, winW, wallT + 200, winH)
         }
         break
       }

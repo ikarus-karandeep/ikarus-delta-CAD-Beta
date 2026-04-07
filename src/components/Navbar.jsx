@@ -113,12 +113,12 @@ export default function Navbar({ step, onStepChange, onExportSVG, onExportDXF, o
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
               IFC
             </button>
-            <button className={`nav-export ${viewMode === '3d' ? 'nav-3d-active' : ''}`} onClick={onView3D} title="Toggle 3D BIM View">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7v10l10 5 10-5V7l-10-5z" /><path d="M12 22V12" /><path d="M22 7l-10 5-10-5" /></svg>
-              {viewMode === '3d' ? '2D' : '3D'}
-            </button>
           </>
         )}
+        <button className={`nav-export ${viewMode === '3d' ? 'nav-3d-active' : ''}`} onClick={onView3D} title="Toggle 3D BIM View">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7v10l10 5 10-5V7l-10-5z" /><path d="M12 22V12" /><path d="M22 7l-10 5-10-5" /></svg>
+          {viewMode === '3d' ? '2D' : '3D'}
+        </button>
       </div>
     </nav>
   )
