@@ -364,3 +364,28 @@
 .status-item span { color: rgba(255,255,255,0.9); }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ADE80; flex-shrink: 0; }
 .status-right { margin-left: auto; }
+
+/* ══════════════════════════════════════
+   PLACEMENT SLOT ANIMATIONS
+══════════════════════════════════════ */
+@keyframes slot-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+@keyframes slot-ripple {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  100% { transform: scale(3);   opacity: 0; }
+}
+
+.slot-dot {
+  animation: slot-blink 1.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.slot-ripple {
+  animation: slot-ripple 1.8s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+  pointer-events: none;
+}
+

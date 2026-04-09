@@ -298,6 +298,12 @@ export default function Canvas({
                       onMouseLeave={() => onSlotHover(null)}
                       onClick={e => { e.stopPropagation(); onSlotPlace(slot) }}
                     >
+                      {/* Ripple ring (idle blink animation) */}
+                      {!isHovered && (
+                        <circle r={8} fill="none"
+                          stroke="#F26419" strokeWidth="1.5"
+                          className="slot-ripple" />
+                      )}
                       {/* Subtle pulse ring on hover */}
                       {isHovered && (
                         <circle r={17} fill="none"
@@ -311,6 +317,7 @@ export default function Canvas({
                         stroke="#F26419"
                         strokeWidth={isHovered ? 0 : 1.5}
                         strokeDasharray={isHovered ? '' : '2.5,2'}
+                        className={isHovered ? undefined : 'slot-dot'}
                       />
                       {/* Number */}
                       <text
